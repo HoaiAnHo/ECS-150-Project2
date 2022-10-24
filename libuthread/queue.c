@@ -48,7 +48,7 @@ int queue_enqueue(queue_t queue, void *data)
 	if (queue->back < FULL - 1){
 		if (queue->front == -1) queue->front = 0;
 		queue->back += 1;
-		queue->arr[queue->back] = &data;
+		queue->arr[queue->back] = *(int *) data;
 	}
 	// if queue is full
 	else{
@@ -64,7 +64,7 @@ int queue_dequeue(queue_t queue, void **data)
 		return -1;
 	}
 	else{
-		*data = queue->arr[queue->front];
+		data = (void *) &(queue->arr[queue->front]);
 		queue->front += 1;
 	}
 	return 0;
@@ -78,7 +78,7 @@ int queue_delete(queue_t queue, void *data)
 	int i = queue->front;
 	while(1){
 		if (i > queue->back) return -1;
-		if (queue->arr[i] == data){
+		if (queue->arr[i] == *(int *) data){
 			// delete item in queue->arr
 			return 0;
 		}
