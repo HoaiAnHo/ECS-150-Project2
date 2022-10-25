@@ -20,7 +20,7 @@ struct queue {
 
 queue_t queue_create(void)
 {
-	queue_t init_queue;
+	queue_t init_queue = NULL;
 	init_queue->front = NULL;
 	init_queue->back = NULL;
 	init_queue->queue_len = 0;
@@ -44,15 +44,15 @@ int queue_enqueue(queue_t queue, void *data)
 	}
 	// if the queue can be added to
 	if (queue->front == NULL) {
-		struct node new = {NULL, NULL, data};
+		struct node new = {NULL, NULL, *(int*) data};
 		*queue->front = new;
 	}
 	else if (queue->front != NULL && queue->back == NULL){
-		struct node new = {queue->front, NULL, data};
+		struct node new = {queue->front, NULL, *(int*) data};
 		*queue->back = new;
 	}
 	else{
-		struct node new = {queue->back, NULL, data};
+		struct node new = {queue->back, NULL, *(int*) data};
 		*queue->back->next = new;
 		*queue->back = new;
 	}
@@ -84,7 +84,7 @@ int queue_delete(queue_t queue, void *data)
 	struct node* check;
 	check = queue->front;
 	while(check){
-		if (check->node_data == *data){
+		if (check->node_data == *(int*) data){
 			struct node* temp_node;
 			temp_node = check->next;
 			// change check's prev's next to check's next
