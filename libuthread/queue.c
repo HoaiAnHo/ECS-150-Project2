@@ -34,7 +34,6 @@ int queue_destroy(queue_t queue)
 	}
 	queue->front = NULL;
 	queue->back = NULL;
-	queue->queue_len = 0;
 	return 0;
 }
 
@@ -76,6 +75,9 @@ int queue_dequeue(queue_t queue, void **data)
 
 int queue_delete(queue_t queue, void *data)
 {
+	if (queue->queue_len == -1){
+		return -2;
+	}
 	if (queue->queue_len == 0 || queue == NULL || data == NULL){
 		return -1;
 	}
@@ -90,6 +92,7 @@ int queue_delete(queue_t queue, void *data)
 			// change check's next's prev to check's prev
 			check->next->prev = check->prev;
 			check = temp_node;
+			queue->queue_len -= 1;
 			return 0;
 		}
 		check = check->next;
@@ -104,7 +107,14 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	}
 	struct node* check;
 	check = queue->front;
+	// queue_t test;
+	// test->queue_len = -1;
 	while(check){
+		// int deletion_check = func(test, check);
+		// if (func(test, check) == -2){
+		// 	check = check->next;
+		// 	continue;
+		// }
 		func(queue, check);
 		check = check->next;
 	}
