@@ -16,7 +16,6 @@ struct queue {
     struct node* front;
     struct node* back;
 	int queue_len;
-	//we're queueing and dequeing addresses
 };
 
 queue_t queue_create(void)
@@ -33,8 +32,9 @@ int queue_destroy(queue_t queue)
 	if (queue->queue_len != 0 || queue == NULL){
 		return -1;
 	}
-	// Deallocate the memory associated to the queue object pointed by @queue
-	// for every queue->arr[i], free(queue->arr[i])
+	queue->front = NULL;
+	queue->back = NULL;
+	queue->queue_len = 0;
 	return 0;
 }
 
@@ -83,9 +83,13 @@ int queue_delete(queue_t queue, void *data)
 	check = queue->front;
 	while(check){
 		if (check->node_data == *data){
-			// get check's prev and next
+			struct node* temp_node;
+			temp_node = check->next;
 			// change check's prev's next to check's next
+			check->prev->next = check->next;
 			// change check's next's prev to check's prev
+			check->next->prev = check->prev;
+			check = temp_node;
 			return 0;
 		}
 		check = check->next;
