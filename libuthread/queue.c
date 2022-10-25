@@ -6,26 +6,25 @@
 
 #define FULL 100
 
+struct node {
+	struct node* prev;
+	struct node* next;
+	int node_data;
+};
+
 struct queue {
-    /* TODO Phase 1 */
-	int* arr;
-    int front;
-    int back;
+    struct node* front;
+    struct node* back;
 	int queue_len;
 	//we're queueing and dequeing addresses
 };
 
-// queue_t should point to an address
-// that address should contain the data?
-
 queue_t queue_create(void)
 {
 	queue_t init_queue;
-	int queue_arr[FULL];
-	init_queue->arr = queue_arr;
+	init_queue->front = NULL;
+	init_queue->back = NULL;
 	init_queue->queue_len = 0;
-	init_queue->front = -1;
-	init_queue->back = -1;
 	return init_queue;
 }
 
@@ -45,14 +44,18 @@ int queue_enqueue(queue_t queue, void *data)
 		return -1;
 	}
 	// if the queue can be added to
-	if (queue->back < FULL - 1){
-		if (queue->front == -1) queue->front = 0;
-		queue->back += 1;
-		queue->arr[queue->back] = *(int *) data;
+	if (queue->front == NULL) {
+		struct node new = {NULL, NULL, data};
+		*queue->front = new;
 	}
-	// if queue is full
+	else if (queue->front != NULL && queue->back == NULL){
+		struct node new = {queue->front, NULL, data};
+		*queue->back = new;
+	}
 	else{
-		return -1;
+		struct node new = {queue->back, NULL, data};
+		*queue->back->next = new;
+		*queue->back = new;
 	}
 	queue->queue_len += 1;
 	return 0;
@@ -64,8 +67,9 @@ int queue_dequeue(queue_t queue, void **data)
 		return -1;
 	}
 	else{
-		data = (void *) &(queue->arr[queue->front]);
-		queue->front += 1;
+		data = (void *) &(queue->front->node_data);
+		*queue->front = *queue->front->next;
+		queue->queue_len -= 1;
 	}
 	return 0;
 }
@@ -75,14 +79,18 @@ int queue_delete(queue_t queue, void *data)
 	if (queue->queue_len == 0 || queue == NULL || data == NULL){
 		return -1;
 	}
-	int i = queue->front;
-	while(1){
-		if (i > queue->back) return -1;
-		if (queue->arr[i] == *(int *) data){
-			// delete item in queue->arr
+	struct node* check;
+	check = queue->front;
+	while(check){
+		if (check->node_data == *data){
+			// get check's prev and next
+			// change check's prev's next to check's next
+			// change check's next's prev to check's prev
 			return 0;
 		}
+		check = check->next;
 	}
+	return -1;
 }
 
 int queue_iterate(queue_t queue, queue_func_t func)
@@ -90,15 +98,11 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	if (queue->queue_len == 0 || queue == NULL || func == NULL){
 		return -1;
 	}
-	int i = queue->front;
-	while(i <= queue->back){
-		if (queue->arr[i] == NULL)
-		{
-			i++;
-			continue;
-		}
-		func(queue, queue->arr[i]);
-		i++;
+	struct node* check;
+	check = queue->front;
+	while(check){
+		func(queue, check);
+		check = check->next;
 	}
 	return 0;
 }
