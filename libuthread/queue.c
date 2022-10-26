@@ -20,7 +20,8 @@ struct queue {
 
 queue_t queue_create(void)
 {
-	queue_t init_queue = NULL;
+	struct queue q;
+	queue_t init_queue = &q;
 	init_queue->front = NULL;
 	init_queue->back = NULL;
 	init_queue->queue_len = 0;
