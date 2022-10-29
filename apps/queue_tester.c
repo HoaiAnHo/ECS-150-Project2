@@ -37,10 +37,37 @@ void test_queue_simple(void)
 	TEST_ASSERT(ptr == &data);
 }
 
+void test_simple_create_and_destroy()
+{
+	int data = 4;
+	queue_t q;
+	fprintf(stderr, "*** TEST create_and_destroy ***\n");
+
+	q = queue_create();
+
+	TEST_ASSERT(!queue_destroy(q));
+}
+
+void test_queue_delete()
+{
+	int data = 4, data_two = 5;
+	queue_t q;
+	fprintf(stderr, "*** TEST queue_delete ***\n");
+
+	q = queue_create();
+	queue_enqueue(q, &data);
+	queue_enqueue(q, &data_two);
+	queue_delete(q, &data_two);
+
+	TEST_ASSERT(queue_length(q) == 1); //currently failing this test case
+}
+
 int main(void)
 {
 	test_create();
 	test_queue_simple();
+	test_simple_create_and_destroy();
+	test_queue_delete();
 
 	return 0;
 }
