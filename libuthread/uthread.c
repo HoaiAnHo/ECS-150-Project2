@@ -8,6 +8,10 @@
 
 #include "private.h"
 #include "uthread.h"
+#include "queue.h"
+
+queue_t ready_queue = queue_create();
+queue_t running_queue = queue_create();
 
 enum state {
 	running = 0,
@@ -33,32 +37,44 @@ void uthread_yield(void)
 
 void uthread_exit(void)
 {
-	/* TODO Phase 2 */
+	// uthread_ctx_destroy_stack(void *top_of_stack)
 }
 
 int uthread_create(uthread_func_t func, void *arg)
 {
 	uthread_ctx_t new_context;
 	void new_stack;
-	new_stack = uthread_ctx_alloc_stack();
-	uthread_ctx_init(*new_context, *new_stack, func, *arg);
+	*new_stack = uthread_ctx_alloc_stack();
+	uthread_ctx_init(&new_context, &new_stack, func, &arg);
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	if (preempt){
 		// preemptive scheduling is enabled
+		// preempt_enable();
 	}
 	// register so-far single execution flow of app as the idle thread
+
 	// create initial thread
 	uthread_ctx_t init_context;
-	void *init_stack;
-	init_stack = uthread_ctx_alloc_stack();
-	struct uthread_tcb new_thread = {init_context, init_stack, ready};
-	uthread_ctx_init(*init_context, *init_stack, func, *arg);
+	void init_stack;
+	*init_stack = uthread_ctx_alloc_stack();
+	struct uthread_tcb idle_thread = {init_context, init_stack, ready};
+	uthread_ctx_init(idle_thread->context, idle_thread->stack, func, *arg);
+
+	// add initial thread to queue
+	queue_enqueue(uthread_queue, *idle_thread);
+
 	// uthread_current should point to new_thread
-	while(1){
+	struct uthread_tcb *current;
+	current = uthread_current();
+
+	while(current){
 		// run through availible threads
+		if (current) {
+			// run thread
+		}
 		// if no more threads, return 0
 		// uthread_yield()
 		return 0;
