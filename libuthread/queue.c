@@ -64,7 +64,8 @@ int queue_enqueue(queue_t queue, void *data)
 		//printf("QUEUE IS NOT EMPTY\n");
 		struct node * copy_back = queue->back;
 		queue->back = &(struct node) {copy_back, NULL, data};
-		copy_back->next = queue->back;
+		if (copy_back != NULL)
+			copy_back->next = queue->back;
 	}
 
 	queue->queue_len += 1;
