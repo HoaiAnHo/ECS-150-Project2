@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
-//#include <stdio.h> //for debugging, remove later
+#include <stdio.h> //for debugging, remove later
 #include <string.h>
 
 #include "queue.h"
@@ -60,12 +60,21 @@ int queue_enqueue(queue_t queue, void *data)
 		queue->front = newNode;
 		queue->back = NULL;
 	}
+	else if (queue->queue_len == 1) {
+		//printf("queue->back is NULL\n");
+		struct node* newNode = (struct node*) malloc(sizeof (struct node));
+		newNode->prev = queue->front;
+		newNode->next = NULL;
+		newNode->node_data = data;
+		//printf("node data: %p\n", (int *) newNode->node_data);
+		queue->back = newNode;
+		queue->front->next = queue->back;
+	}
 	else {
 		//printf("QUEUE IS NOT EMPTY\n");
 		struct node * copy_back = queue->back;
 		queue->back = &(struct node) {copy_back, NULL, data};
-		if (copy_back != NULL)
-			copy_back->next = queue->back;
+		copy_back->next = queue->back;
 	}
 
 	queue->queue_len += 1;
@@ -97,16 +106,25 @@ int queue_delete(queue_t queue, void *data)
 	// create a pointer to the front node
 	struct node* check;
 	check = queue->front;
-	while(check){
+	while(check != NULL){
+		//printf("Hi 1! node data: %p data: %p\n", check->node_data, data);
 		if (check->node_data == data){
-			struct node* temp_node;
-			temp_node = check->next;
-			// change check's prev's next to check's next
-			check->prev->next = check->next;
-			// change check's next's prev to check's prev
-			check->next->prev = check->prev;
-			check = temp_node;
+			//printf("Hi!\n");
+			if (check->next == NULL) {
+				check->prev->next = NULL;
+				free(check);
+			}
+			else {
+				struct node* temp_node;
+				temp_node = check->next;
+				// change check's prev's next to check's next
+				check->prev->next = check->next;
+				// change check's next's prev to check's prev
+				check->next->prev = check->prev;
+				check = temp_node;
+			}
 			queue->queue_len -= 1;
+			//printf("Bye!\n");
 			return 0;
 		}
 		check = check->next;
