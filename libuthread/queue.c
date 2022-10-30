@@ -25,7 +25,6 @@ struct queue {
 
 queue_t queue_create(void)
 {
-	//struct queue q = malloc(sizeof (struct queue));// = {NULL, NULL, 0};
 	queue_t init_queue = (struct queue *) malloc(sizeof (struct queue));
 	init_queue->back = NULL;
 	init_queue->front = NULL;
@@ -33,7 +32,7 @@ queue_t queue_create(void)
 	return init_queue;
 }
 
-int queue_destroy(queue_t queue)
+int queue_destroy(queue_t queue) //just need to implement freeing parts
 {
 	if (queue->queue_len != 0 || queue == NULL){
 		return -1;
@@ -94,7 +93,7 @@ int queue_dequeue(queue_t queue, void **data)
 	return 0;
 }
 
-int queue_delete(queue_t queue, void *data)
+int queue_delete(queue_t queue, void *data) //need to free data whenever we "delete" it
 {
 	// if (queue->queue_len == -1){
 	// 	return -2;
@@ -112,6 +111,8 @@ int queue_delete(queue_t queue, void *data)
 			//printf("Hi!\n");
 			if (check == queue->front) {
 				queue->front = queue->front->next;
+				if (queue->front == queue->back)
+					queue->back = NULL;
 				if (queue->front != NULL)
 					queue->front->prev = NULL;
 			}
