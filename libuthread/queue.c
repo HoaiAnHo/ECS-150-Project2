@@ -110,7 +110,12 @@ int queue_delete(queue_t queue, void *data)
 		//printf("Hi 1! node data: %p data: %p\n", check->node_data, data);
 		if (check->node_data == data){
 			//printf("Hi!\n");
-			if (check->next == NULL) {
+			if (check == queue->front) {
+				queue->front = queue->front->next;
+				if (queue->front != NULL)
+					queue->front->prev = NULL;
+			}
+			else if (check->next == NULL) {
 				check->prev->next = NULL;
 				free(check);
 			}
