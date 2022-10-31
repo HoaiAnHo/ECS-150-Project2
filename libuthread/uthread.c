@@ -28,16 +28,25 @@ struct uthread_tcb {
 struct uthread_tcb *uthread_current(void)
 {
 	/* TODO Phase 2/3 */
+	// return either front of ready or front of running
+	// return running_queue->front;
+	// why won't the queue point to any of its members???
 }
 
 void uthread_yield(void)
 {
-	// uthread_ctx_switch();
+	// get running thread and front of ready queue
+	// uthread_ctx_switch(pointer of running context, pointer of front context);
+	// switch threads from running to ready and vice versa
 }
 
 void uthread_exit(void)
 {
+	// first get thread
+	// remove thread from queue
 	// uthread_ctx_destroy_stack(void *top_of_stack)
+	// maybe destroy context?
+	// queue_delete(ready_queue, thread)
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -51,7 +60,7 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	if (preempt){
-		// preemptive scheduling is enabled
+		// preemptive scheduling is enabled (phase 4)
 		// preempt_enable();
 	}
 	// register so-far single execution flow of app as the idle thread
@@ -64,7 +73,10 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	uthread_ctx_init(idle_thread->context, idle_thread->stack, func, *arg);
 
 	// add initial thread to queue
-	queue_enqueue(uthread_queue, *idle_thread);
+	queue_enqueue(ready_queue, *idle_thread);
+	// question, where do we get the other threads???
+	// create threads??? uthread_create(func, arg)
+	// is this file assuming we're only running one thread???
 
 	// uthread_current should point to new_thread
 	struct uthread_tcb *current;
@@ -75,8 +87,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		if (current) {
 			// run thread
 		}
-		// if no more threads, return 0
 		// uthread_yield()
+		// if no more threads, return 0
+			// destroy ready_queue and running_queue
 		return 0;
 	}
 }
