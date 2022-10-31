@@ -17,11 +17,11 @@ enum state {
 	running = 0,
 	ready = 1,
 	exited = 2
-}
+};
 
 struct uthread_tcb {
 	uthread_ctx_t context;
-	void stack;
+	void * stack;
 	int u_state;
 };
 
@@ -43,8 +43,8 @@ void uthread_exit(void)
 int uthread_create(uthread_func_t func, void *arg)
 {
 	uthread_ctx_t new_context;
-	void new_stack;
-	*new_stack = uthread_ctx_alloc_stack();
+	void * new_stack;
+	new_stack = uthread_ctx_alloc_stack();
 	uthread_ctx_init(&new_context, &new_stack, func, &arg);
 }
 
@@ -58,13 +58,16 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 
 	// create initial thread
 	uthread_ctx_t init_context;
-	void init_stack;
-	*init_stack = uthread_ctx_alloc_stack();
-	struct uthread_tcb idle_thread = {init_context, init_stack, ready};
-	uthread_ctx_init(idle_thread->context, idle_thread->stack, func, *arg);
+	void * init_stack;
+	init_stack = uthread_ctx_alloc_stack();
+	struct uthread_tcb * idle_thread = (struct uthread_tcb *) malloc(sizeof (struct uthread_tcb));
+	idle_thread->context = init_context;
+	idle_thread->stack = init_stack;
+	idle_thread->u_state = ready;
+	uthread_ctx_init(idle_thread, idle_thread->stack, func, arg);
 
 	// add initial thread to queue
-	queue_enqueue(uthread_queue, *idle_thread);
+	queue_enqueue(uthread_queue, *idle_thread); //syntax issues need to talk to An about this
 
 	// uthread_current should point to new_thread
 	struct uthread_tcb *current;
@@ -90,4 +93,3 @@ void uthread_unblock(struct uthread_tcb *uthread)
 {
 	/* TODO Phase 3 */
 }
-
