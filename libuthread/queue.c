@@ -72,7 +72,11 @@ int queue_enqueue(queue_t queue, void *data)
 	else {
 		//printf("QUEUE IS NOT EMPTY\n");
 		struct node * copy_back = queue->back;
-		queue->back = &(struct node) {copy_back, NULL, data};
+		struct node* newNode = (struct node*) malloc(sizeof (struct node));
+		newNode->prev = copy_back;
+		newNode->next = NULL;
+		newNode->node_data = data;
+		queue->back = newNode;
 		copy_back->next = queue->back;
 	}
 
@@ -108,17 +112,17 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 	while(check != NULL){
 		//printf("Hi 1! node data: %p data: %p\n", check->node_data, data);
 		if (check->node_data == data){
-			//printf("Hi!\n");
+			printf("Hi!\n");
 			if (check == queue->front) {
 				queue->front = queue->front->next;
 				if (queue->front == queue->back)
 					queue->back = NULL;
-				if (queue->front != NULL)
+				else if (queue->front != NULL)
 					queue->front->prev = NULL;
 			}
 			else if (check->next == NULL) {
 				check->prev->next = NULL;
-				free(check);
+				//free(check);
 			}
 			else {
 				struct node* temp_node;
@@ -127,10 +131,11 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 				check->prev->next = check->next;
 				// change check's next's prev to check's prev
 				check->next->prev = check->prev;
-				check = temp_node;
+				//check = temp_node;
 			}
 			queue->queue_len -= 1;
-			//printf("Bye!\n");
+			free(check);
+			printf("Bye!\n");
 			return 0;
 		}
 		check = check->next;
@@ -145,15 +150,23 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	}
 	struct node* check;
 	check = queue->front;
+	printf("first val in queue: %d\n", *(int *) check->node_data);
 	// queue_t test;
 	// test->queue_len = -1;
-	while(check){
+	while(check != NULL){
 		// int deletion_check = func(test, check);
 		// if (func(test, check) == -2){
 		// 	check = check->next;
 		// 	continue;
 		// }
-		func(queue, check);
+		if (check->node_data == NULL)
+			printf("seg fault\n");
+		void * initData = check->node_data;
+		printf("Going to run func on data %d in queue\n", *(int *) check->node_data);
+		func(queue, check->node_data);
+		printf("I ran func and got %d\n\n", *(int *) check->node_data);
+		if (check->node_data != initData)
+			printf("I deleted the data here\n");
 		check = check->next;
 	}
 	return 0;
