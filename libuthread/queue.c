@@ -7,6 +7,8 @@
 
 #define FULL 100
 
+int is_iterating = 0; //boolean to check if in queue iterate
+
 struct node {
 	struct node* prev; //node infront of current
 	struct node* next; //node behind current
@@ -89,7 +91,7 @@ int queue_dequeue(queue_t queue, void **data)
 	if (queue->queue_len == 0 || queue == NULL || data == NULL || queue->front == NULL){
 		return -1;
 	}
-	*data = queue->front->node_data;
+	*data = queue->front; //->node_data;
 	//printf("data: %p\n", queue->front->node_data);
 	queue->front = queue->front->next;
 	queue->queue_len -= 1;
@@ -106,6 +108,8 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 	if (queue->queue_len == 0 || queue == NULL || data == NULL){
 		return -1;
 	}
+	if (is_iterating)
+		return 0;
 	// create a pointer to the front node
 	struct node* check;
 	check = queue->front;
@@ -119,10 +123,11 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 					queue->back = NULL;
 				else if (queue->front != NULL)
 					queue->front->prev = NULL;
+				free(check); //edit - not in csif yet
 			}
 			else if (check->next == NULL) {
 				check->prev->next = NULL;
-				//free(check);
+				free(check); //edit - not in csif yet
 			}
 			else {
 				struct node* temp_node;
@@ -131,10 +136,11 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 				check->prev->next = check->next;
 				// change check's next's prev to check's prev
 				check->next->prev = check->prev;
-				//check = temp_node;
+				free(check); //edit - not in csif yet
+				check = temp_node;
 			}
 			queue->queue_len -= 1;
-			free(check);
+			//free(check);
 			printf("Bye!\n");
 			return 0;
 		}
@@ -148,6 +154,9 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	if (queue->queue_len == 0 || queue == NULL || func == NULL){
 		return -1;
 	}
+	
+	is_iterating = 1;
+
 	struct node* check;
 	check = queue->front;
 	printf("first val in queue: %d\n", *(int *) check->node_data);
@@ -169,6 +178,8 @@ int queue_iterate(queue_t queue, queue_func_t func)
 			printf("I deleted the data here\n");
 		check = check->next;
 	}
+
+	is_iterating = 0;
 	return 0;
 }
 
