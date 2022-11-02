@@ -169,13 +169,15 @@ int queue_iterate(queue_t queue, queue_func_t func)
 		// 	continue;
 		// }
 		if (check->node_data == NULL)
-			printf("seg fault\n");
+			return -1;
+			//printf("seg fault\n");
 		void * initData = check->node_data;
-		printf("Going to run func on data %d in queue\n", *(int *) check->node_data);
+		//printf("Going to run func on data %d in queue\n", *(int *) check->node_data);
 		func(queue, check->node_data);
-		printf("I ran func and got %d\n\n", *(int *) check->node_data);
+		//printf("I ran func and got %d\n\n", *(int *) check->node_data);
 		if (check->node_data != initData)
-			printf("I deleted the data here\n");
+			return -1;
+			//printf("I deleted the data here\n");
 		check = check->next;
 	}
 
