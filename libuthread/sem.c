@@ -7,13 +7,14 @@
 
 struct semaphore {
 	/* TODO Phase 3 */
-	//queue_t sem_queue;
+	queue_t sem_queue;
+	int queue_count;
 };
 
 sem_t sem_create(size_t count)
 {
 	/* TODO Phase 3 */
-	//queue_t sem_queue = queue_create();
+	queue_t sem_queue = queue_create();
 }
 
 int sem_destroy(sem_t sem)

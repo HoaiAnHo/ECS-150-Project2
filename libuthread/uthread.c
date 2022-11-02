@@ -234,8 +234,9 @@ void uthread_yield(void)
 	// queue_enqueue(blocked_queue, uthread_current());
 	queue_enqueue(ready_queue, uthread_current());
 	uthread_current()->u_state = ready;
-	uthread_ctx_switch(uthread_current()->context, *(struct uthread_tcb *) yield_to->context);
-	yield_to->u_state = running;
+	struct uthread_tcb * copy_yield = (struct uthread_tcb *) *yield_to;
+	uthread_ctx_switch(uthread_current()->context, copy_yield->context);
+	copy_yield->u_state = running;
 
 	// don't forget state checking and changing before ctx switch
 	//update state
@@ -338,5 +339,6 @@ void uthread_block(void)
 void uthread_unblock(struct uthread_tcb *uthread)
 {
 	/* TODO Phase 3 */
-	queue_dequeue(ready_queue, &uthread);
+	void ** uthread_copy;
+	queue_dequeue(ready_queue, uthread_copy);
 }
