@@ -93,12 +93,12 @@ int queue_enqueue(queue_t queue, void *data)
 	return 0;
 }
 
-int queue_dequeue(queue_t queue, void *data)
+int queue_dequeue(queue_t queue, void **data)
 {
 	if (queue->queue_len == 0 || queue == NULL || data == NULL || queue->front == NULL){
 		return -1;
 	}
-	data = queue->front; //->node_data;
+	*data = queue->front->node_data; //->node_data; <- can't do this
 	//printf("data: %p\n", queue->front->node_data);
 	queue->front = queue->front->next;
 	queue->queue_len -= 1;
@@ -123,7 +123,7 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 	while(check != NULL){
 		//printf("Hi 1! node data: %p data: %p\n", check->node_data, data);
 		if (check->node_data == data){
-			printf("Hi!\n");
+			//printf("Hi!\n");
 			if (check == queue->front) {
 				queue->front = queue->front->next;
 				if (queue->front == queue->back)
@@ -148,7 +148,7 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 			}
 			queue->queue_len -= 1;
 			//free(check);
-			printf("Bye!\n");
+			//printf("Bye!\n");
 			return 0;
 		}
 		check = check->next;
@@ -176,13 +176,15 @@ int queue_iterate(queue_t queue, queue_func_t func)
 		// 	continue;
 		// }
 		if (check->node_data == NULL)
-			printf("seg fault\n");
+			return -1;
+			//printf("seg fault\n");
 		void * initData = check->node_data;
-		printf("Going to run func on data %d in queue\n", *(int *) check->node_data);
+		//printf("Going to run func on data %d in queue\n", *(int *) check->node_data);
 		func(queue, check->node_data);
-		printf("I ran func and got %d\n\n", *(int *) check->node_data);
+		//printf("I ran func and got %d\n\n", *(int *) check->node_data);
 		if (check->node_data != initData)
-			printf("I deleted the data here\n");
+			return -1;
+			//printf("I deleted the data here\n");
 		check = check->next;
 	}
 
@@ -227,12 +229,12 @@ struct uthread_tcb *uthread_current(void)
 void uthread_yield(void)
 {
 	// yield just puts thread back into queue
-	struct uthread_tcb *yield_to;
+	void ** yield_to;
 	queue_dequeue(ready_queue, yield_to);
 	// queue_enqueue(blocked_queue, uthread_current());
 	queue_enqueue(ready_queue, uthread_current());
 	uthread_current()->u_state = ready;
-	uthread_ctx_switch(uthread_current()->context, yield_to->context);
+	uthread_ctx_switch(uthread_current()->context, *(struct uthread_tcb *) yield_to->context);
 	yield_to->u_state = running;
 
 	// don't forget state checking and changing before ctx switch
