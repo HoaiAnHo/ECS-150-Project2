@@ -30,15 +30,21 @@ struct uthread_tcb {
 struct uthread_tcb *uthread_current(void)
 {
 	/* TODO Phase 2/3 */
-	return (struct uthread_tcb *) ready_queue->front->node_data;
+	if (queue_length(ready_queue) > 0){
+		// return (struct uthread_tcb *) ready_queue->front->node_data;
+		return &ready_queue->front->node_data;
+	}
+	return &blocked_queue->front->node_data;
 }
 
 void uthread_yield(void)
 {
 	struct uthread_tcb *yield_to;
-	queue_dequeue(ready_queue, yield_to);
-	queue_enqueue(blocked_queue, uthread_current());
-	uthread_ctx_switch(uthread_current(), &yield_to);
+	queue_dequeue(ready_queue, &yield_to);
+	// queue_enqueue(blocked_queue, uthread_current());
+	queue_enqueue(ready_queue, uthread_current());
+	uthread_ctx_switch(&uthread_current()->context, &yield_to->context);
+	
 	// don't forget state checking and changing before ctx switch
 	//update state
 }
@@ -95,6 +101,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	idle_thread->stack = init_stack;
 	idle_thread->u_state = running;
 	//uthread_ctx_init(idle_thread, idle_thread->stack, func, arg);
+	queue_enqueue(blocked_queue, idle_thread);
 	
 	// add initial thread
 	uthread_create(func, &arg);
@@ -109,6 +116,10 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		// after function is done, remove from queue
 		queue_delete(ready_queue, current);
 		// get another thread from queue? current?
+		if (queue_length(ready_queue) == 0){
+			current = uthread_current();
+			queue_delete(blocked_queue, current);
+		}
 	}
 	// if no more threads, return 0
 	queue_destroy(ready_queue);
