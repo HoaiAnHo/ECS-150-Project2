@@ -103,7 +103,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	struct uthread_tcb *current;
 	current = uthread_current();
 
-	while(current != NULL){
+	while(current != NULL && queue_length(ready_queue) == 0 && queue_length(blocked_queue) == 0){
 		// run through availible thread
 		uthread_yield();
 		// after function is done, remove from queue
