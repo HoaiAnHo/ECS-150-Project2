@@ -91,7 +91,7 @@ int queue_dequeue(queue_t queue, void **data)
 	if (queue->queue_len == 0 || queue == NULL || data == NULL || queue->front == NULL){
 		return -1;
 	}
-	*data = queue->front; //->node_data;
+	*data = queue->front->node_data; //->node_data; <- can't do this
 	//printf("data: %p\n", queue->front->node_data);
 	queue->front = queue->front->next;
 	queue->queue_len -= 1;
@@ -116,7 +116,7 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 	while(check != NULL){
 		//printf("Hi 1! node data: %p data: %p\n", check->node_data, data);
 		if (check->node_data == data){
-			printf("Hi!\n");
+			//printf("Hi!\n");
 			if (check == queue->front) {
 				queue->front = queue->front->next;
 				if (queue->front == queue->back)
@@ -141,7 +141,7 @@ int queue_delete(queue_t queue, void *data) //need to free data whenever we "del
 			}
 			queue->queue_len -= 1;
 			//free(check);
-			printf("Bye!\n");
+			//printf("Bye!\n");
 			return 0;
 		}
 		check = check->next;
