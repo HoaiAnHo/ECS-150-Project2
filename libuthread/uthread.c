@@ -51,8 +51,16 @@ void uthread_yield(void)
 
 void uthread_exit(void)
 {
-	// uthread_ctx_destroy_stack(void *top_of_stack)
+	// get current running thread
+	// uthread_ctx_destroy_stack(&uthread_current()->stack);
+	// uthread_current()->u_state = exited;
 	//update state
+	// if (queue_length(ready_queue) > 0){
+	//     queue_delete(ready_queue->front->node_data);	
+	// }
+	// else{
+	//     	queue_delete(blocked_queue->front->node_data);	
+	// }
 }
 
 int uthread_create(uthread_func_t func, void *arg) //done
