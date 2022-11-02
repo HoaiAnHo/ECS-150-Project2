@@ -5,8 +5,6 @@
 
 #include "queue.h"
 
-#define FULL 100
-
 int is_iterating = 0; //boolean to check if in queue iterate
 
 struct node {
@@ -86,12 +84,12 @@ int queue_enqueue(queue_t queue, void *data)
 	return 0;
 }
 
-int queue_dequeue(queue_t queue, void **data)
+int queue_dequeue(queue_t queue, void *data)
 {
 	if (queue->queue_len == 0 || queue == NULL || data == NULL || queue->front == NULL){
 		return -1;
 	}
-	*data = queue->front; //->node_data;
+	data = queue->front; //->node_data;
 	//printf("data: %p\n", queue->front->node_data);
 	queue->front = queue->front->next;
 	queue->queue_len -= 1;

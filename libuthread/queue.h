@@ -56,7 +56,7 @@ int queue_enqueue(queue_t queue, void *data);
  * Return: -1 if @queue or @data are NULL, or if the queue is empty. 0 if @data
  * was set with the oldest item available in @queue.
  */
-int queue_dequeue(queue_t queue, void **data);
+int queue_dequeue(queue_t queue, void *data);
 
 /*
  * queue_delete - Delete data item
