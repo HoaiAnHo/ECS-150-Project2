@@ -15,8 +15,5 @@ queue.o: queue.c queue.h
 uthread.o: uthread.c uthread.h
 	$(CC) $(CFLAGS) -c -o uthread.o uthread.c
 
-uthread_hello.o: queue.c uthread.c context.c
-	$(CC) $(CFLAGS) -c -o $@
-
 clean:
 	rm -f $(lib) queue.o
