@@ -159,7 +159,7 @@ int queue_iterate(queue_t queue, queue_func_t func)
 
 	struct node* check;
 	check = queue->front;
-	printf("first val in queue: %d\n", *(int *) check->node_data);
+	//printf("first val in queue: %d\n", *(int *) check->node_data);
 	// queue_t test;
 	// test->queue_len = -1;
 	while(check != NULL){

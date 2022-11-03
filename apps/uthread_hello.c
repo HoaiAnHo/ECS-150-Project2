@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <uthread.h>
+// #include <uthread.h>
+#include "../libuthread/uthread.h"
 
 void hello(void *arg)
 {
