@@ -99,7 +99,7 @@ beyond the ones given to us in the skeleton code, we were good to go on the
 linked lists.
 
 Some initial versions of the uthread.c code ran into trouble whenever we tried 
-to access a TCB in the queue without dequeueing, as our thread queues model
+to access a TCB in the queue without dequeuing, as our thread queues model
 considered the front thread of the ready queue as "running". So at some point, we 
 copied over the entire code of queue.c to access those directly from the queue.
 However, we realized that dequeuing through uthread_current() to access a current
