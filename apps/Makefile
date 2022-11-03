@@ -5,7 +5,7 @@ programs := \
 	uthread_yield.x
 
 # FIXME: Remove this in student version
-#programs += \
+programs += \
 	queue_usage_example.x \
 	queue_grader.x \
 	uthread_preempt.x \
