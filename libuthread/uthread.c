@@ -67,7 +67,6 @@ void uthread_yield(void)
 	struct uthread_tcb *yield_to = uthread_current();
 	yield_to->u_state = running;
 	queue_enqueue(running_queue, yield_to);
-	// struct uthread_tcb * copy_yield = (struct uthread_tcb *) *yield_to;
 	uthread_ctx_switch(yielding->context, yield_to->context);
 	
 	uthread_exit();
@@ -76,7 +75,7 @@ void uthread_yield(void)
 void uthread_exit(void)
 {
 	// function hasn't actually ended, it's just in a zombie state to be put into queue later
-
+	
 	// get current running thread and move to exited
 	struct uthread_tcb * exit_uthread = uthread_current();
 	// uthread_ctx_destroy_stack(exit_uthread->stack);
