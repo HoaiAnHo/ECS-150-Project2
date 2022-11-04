@@ -9,6 +9,8 @@
 #include "private.h"
 #include "uthread.h"
 #include "queue.h"
+#include "context.c" //test
+#include "preempt.c" //test
 
 queue_t running_queue;
 queue_t ready_queue; 

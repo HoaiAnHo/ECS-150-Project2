@@ -6,9 +6,6 @@ programs := \
 
 # FIXME: Remove this in student version
 programs += \
-	queue_usage_example.x \
-	queue_grader.x \
-	uthread_preempt.x \
 	sem_buffer.x \
 	sem_count.x \
 	sem_prime.x \

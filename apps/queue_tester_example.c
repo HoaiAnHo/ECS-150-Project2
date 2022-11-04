@@ -39,7 +39,6 @@ void test_queue_simple(void)
 
 void test_simple_create_and_destroy()
 {
-	int data = 4;
 	queue_t q;
 	fprintf(stderr, "*** TEST create_and_destroy ***\n");
 
