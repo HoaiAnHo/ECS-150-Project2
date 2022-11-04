@@ -9,8 +9,10 @@
 #include "private.h"
 #include "uthread.h"
 #include "queue.h"
-#include "context.c" //test
-#include "preempt.c" //test
+
+// these were meant to be fixed later with Makefile
+#include "context.c"
+#include "preempt.c"
 
 queue_t running_queue;
 queue_t ready_queue; 
