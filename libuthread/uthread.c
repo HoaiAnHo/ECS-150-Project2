@@ -69,6 +69,8 @@ void uthread_yield(void)
 	queue_enqueue(running_queue, yield_to);
 	// struct uthread_tcb * copy_yield = (struct uthread_tcb *) *yield_to;
 	uthread_ctx_switch(yielding->context, yield_to->context);
+	
+	only_idle = 1;
 }
 
 void uthread_exit(void)
