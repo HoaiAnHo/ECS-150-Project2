@@ -70,7 +70,7 @@ void uthread_yield(void)
 	// struct uthread_tcb * copy_yield = (struct uthread_tcb *) *yield_to;
 	uthread_ctx_switch(yielding->context, yield_to->context);
 	
-	only_idle = 1;
+	uthread_exit();
 }
 
 void uthread_exit(void)
