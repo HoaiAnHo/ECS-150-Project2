@@ -15,6 +15,7 @@
 queue_t running_queue;
 queue_t ready_queue; 
 queue_t exited_queue;
+queue_t blocked_queue;
 
 int only_idle = 0;
 
@@ -46,6 +47,11 @@ struct uthread_tcb *uthread_current(void)
 		queue_dequeue(ready_queue, (void **)&data);
 		return data;
 	}
+	else if (queue_length(running_queue) == 0 && queue_length(running_queue) == 0){
+		queue_dequeue(exited_queue, (void **)&data);
+		return data;
+	}
+
 	return NULL;
 }
 
@@ -110,15 +116,12 @@ int uthread_create(uthread_func_t func, void *arg) //done
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
-	// create a running, ready, and exited queue
-	// a running queue only contains the current thread
+	// create running, ready, blocked, and exited queues
 	running_queue = queue_create();
-
-	// a ready queue contains all the cycling threads
 	ready_queue = queue_create();
-
-	// an exited queue contains the threads that exited
+	blocked_queue = queue_create();
 	exited_queue = queue_create();
+
 
 	//phase 4 - preemption
 	if (preempt){
@@ -151,26 +154,49 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	// if no more threads, return 0
 	queue_destroy(running_queue);
 	queue_destroy(ready_queue);
+	queue_destroy(blocked_queue);
 	// run a loop to delete everything in blocked_queue
+	struct uthread_tcb *last_uthread;
+	while (queue_length(exited_queue) > 0){
+		last_uthread = uthread_current();
+		uthread_ctx_destroy_stack((void *)&last_uthread->context);
+	}
 	queue_destroy(exited_queue);
 	return 0;
 }
 
-// void uthread_block(void)
-// {
-// 	/* TODO Phase 3 */
-// }
+void uthread_block(void)
+{
+	// dequeue current running thread into the blocked queue
+	struct uthread_tcb *block_uthread = uthread_current();
+	block_uthread->u_state = blocked;
+	queue_enqueue(blocked_queue, block_uthread);
 
-// void uthread_unblock(struct uthread_tcb *uthread)
-// {
-// 	/* TODO Phase 3 */
-// 	void ** uthread_copy;
-// 	queue_dequeue(ready_queue, uthread_copy);
-// }
+	// dequeue next ready thread into running queue
+	struct uthread_tcb *yield_to = uthread_current();
+	yield_to->u_state = running;
+	queue_enqueue(running_queue, yield_to);
+	uthread_ctx_switch(block_uthread->context, yield_to->context);
+}
 
-//(void **)&ptr
+void uthread_unblock(struct uthread_tcb *uthread)
+{
+	// dequeue the front thread of blocked_queue
+	struct uthread_tcb * awaken_uthread;
+	queue_dequeue(blocked_queue, (void **)&awaken_uthread);
 
-//queue_t queue;
-//int data = 3, *ptr;
-//queue_enqueue(queue, &data);
-//queue_dequeue(queue, (void **)&ptr);
+	// loop until you find the thread in the blocked queue that matches uthread
+	while (1){
+		// if match is found, enqueue that thread into the ready queue
+		if (&awaken_uthread == &uthread){
+			queue_enqueue(ready_queue, awaken_uthread);
+			awaken_uthread->u_state = ready;
+			break;
+		}
+		// else, enqueue thread back into blocked queue and grab the next thread
+		else{
+			queue_enqueue(blocked_queue, awaken_uthread);
+			queue_dequeue(blocked_queue, (void **)&awaken_uthread);
+		}
+	}
+}
