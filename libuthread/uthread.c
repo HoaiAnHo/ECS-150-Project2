@@ -44,8 +44,6 @@ struct uthread_tcb *uthread_current(void)
 	}
 	// if nothing's in the running queue and there's something in the ready queue, dequeue the ready thread
 	else if (queue_length(ready_queue) > 0){
-		// return (struct uthread_tcb *) ready_queue->front->node_data;
-		// return ready_queue->front->node_data;
 		queue_dequeue(ready_queue, (void **)&data);
 		return data;
 	}
@@ -127,7 +125,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	exited_queue = queue_create();
 
 
-	//phase 4 - preemption
+	// phase 4 - preemption
 	if (preempt){
 		// preemptive scheduling is enabled
 		// preempt_enable();
