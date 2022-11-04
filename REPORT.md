@@ -9,9 +9,11 @@ values of the pointers to a node's previous and next nodes, we
 implemented queue_create, queue_destroy, queue_enqueue, queue_dequeue, and
 queue_delete as functions of the queue.
 
-To test our code, we ran unit tests through the queue_tester.c file. We
-tried to create a test case for each function we implemented along with
-some little edge cases we noticed.
+To test our code, we ran unit tests through the queue_tester_example.c file. 
+We tried to create a test case for each function we implemented along with
+some little edge cases we noticed. Looking through the tester, one can see 
+how we created a new function for each test case. To increase readability, 
+each function's name explains what the test being performed is.
 
 # Phase 2: Uthread API
 The uthread API uitlized our linked list queue from phase 1, plus the context
@@ -89,8 +91,13 @@ prioritized the quality of the queue and uthread implementations.
 # Makefile
 For each phase, we included the compilation lines for the associated files
 accordingly. We created libuthread.a accordingly at the start. We also tried
-including the tester files in the make so that those files could also access 
-"undefined" functions like in the context.c file.
+including the tester files in app's Makefile so that those files could also 
+access the functions in libuthread's files. We also attempted to implement 
+some variables to handle printing of gcc's output, but we weren't able to 
+finish it in time. Since we weren't able to implement some files completely,
+we were thrown multiples errors when running "make". Therefore, some files
+will reflect the changes that were necessary to make sure that this was 
+successful.
 
 # Project Issues
 Before settling on a linked list implementation for queue.c, the team considered
@@ -108,7 +115,17 @@ TCB and using running queue to hold the current running thread could fix our
 issues without having to copy over the queue.c code, so that's what we went with.
 
 Another previous issue in uthread.c was the gcc compiler complaining about the 
-context variables being used "unitialized" whenever we used the context_init 
+context variables being used "uninitialized" whenever we used the context_init 
 function. We got around this by initializing the context variable as a normal 
 variable, then inputting that context as a pointer parameter with & in the 
 context_init function.
+
+We also faced a lot of syntax errors due to our lack of knowledge in C. This 
+led to a lot of our time being spent fixing every part of code that failed. 
+Therefore, our test cases were strong but our code itself was quite weak. 
+Due to this time reallocation, we were not able to finish a majority of the
+project in the way that we would've liked to. For example, even in the code
+that we did write, we would've liked to implement more freeing aspects when 
+dealing with deletions of any kind. Right now, we're just glossing over the
+fact that data is just floating around unallocated in our computers.
+
