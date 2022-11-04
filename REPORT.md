@@ -70,12 +70,13 @@ This utilizes lock implementations in order to prevent starvation of resources.
 Most of the work for this was done in sem.c, but we also went back to uthread.c
 to modify the block functions for this phase.
 
-(Not actually implemented but here's an idea: if a thread is considered to have
-the possibility of starving the process due to the resources they'd hoard,
-they're placed in the blocked queue with the blocked status. The blocked queue
-is checked periodically to see if the front thread can come back to the running
-queue as they're no longer a threat to the safe state. This would be implemented
-through the uthread_block and uthread_unblock functions in uthread.c).
+This is a current plan for the block functions in uthread.c: if uthread_block()
+is used, the running thread is placed in the blocked queue with the blocked 
+status, while the next ready thread is dequeued into the running queue. If 
+uthread_unblock() is called with a given thread TCB pointer as a parameter, then
+we loop through the queue, dequeuing and enqueing the blocked threads until we 
+find one that matches the given TCB parameter. We will then enqueue that thread
+into the ready queue of threads, give it the proper ready status, and return.
 
 # Phase 4: Preemption
 There is an "if" statement in uthread_run() that checks whether or not preempt
